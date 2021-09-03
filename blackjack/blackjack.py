@@ -1,3 +1,6 @@
+import random
+
+
 class Card:
     def __init__(self, suit: str, n: int):
         self._suit = suit
@@ -20,12 +23,38 @@ class Deck:
         ]
 
     def shuffle(self) -> None:
-        pass
+        random.shuffle(self.cards)
+
+    def pop(self) -> Card:
+        return self.cards.pop()
 
 
 class Player:
-    pass
+    def __init__(self):
+        self.hands = []
+
+    @property
+    def total_points(self) -> int:
+        return sum([card.point for card in self.hands])
+
+    def draw(self, deck: Deck) -> None:
+        new_card = deck.pop()
+        self.hands.append(new_card)
+        print(f"Playerは{new_card}を引きました。")
 
 
 class Dealer:
-    pass
+    def __init__(self):
+        self.hands = []
+
+    @property
+    def total_points(self) -> int:
+        return sum([card.point for card in self.hands])
+
+    def draw(self, deck: Deck, display: bool = True) -> None:
+        new_card = deck.pop()
+        self.hands.append(new_card)
+        if display:
+            print(f"Dealerは{new_card}を引きました。")
+        else:
+            print("Dealerはカードを引きました。")
