@@ -1,5 +1,8 @@
 import random
 
+SUITS = ("H", "D", "C", "S")
+NUMBERS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+
 
 class Card:
     def __init__(self, suit: str, n: int):
@@ -18,9 +21,7 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.cards = [
-            Card(suit, n) for suit in ["H", "D", "C", "S"] for n in range(1, 14)
-        ]
+        self.cards = [Card(suit, n) for suit in SUITS for n in NUMBERS]
 
     def shuffle(self) -> None:
         random.shuffle(self.cards)
