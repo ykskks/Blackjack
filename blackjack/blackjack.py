@@ -10,13 +10,27 @@ class Card:
             raise TypeError("suit must be of type str.")
         elif suit not in SUITS:
             raise ValueError(f"suit must be one of {SUITS}.")
-        self._suit = suit
+        self.__suit = suit
 
         if not isinstance(n, int):
             raise TypeError("n must be of type int.")
         elif n not in NUMBERS:
             raise ValueError(f"n must be one of {NUMBERS}.")
-        self._n = n
+        self.__n = n
+
+    def __eq__(self, other):
+        return (self.__suit, self.__n) == (other.__suit, other.__n)
+
+    def __hash__(self):
+        return hash((self.__suit, self.__n))
+
+    @property
+    def suit(self):
+        return self.__suit
+
+    @property
+    def n(self):
+        return self.__n
 
     @property
     def point(self) -> int:
@@ -25,7 +39,7 @@ class Card:
         Returns:
             int: カードのポイント
         """
-        return min(self._n, 10)
+        return min(self.__n, 10)
 
 
 class Deck:
