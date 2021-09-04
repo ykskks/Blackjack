@@ -25,3 +25,23 @@ class TestCard:
     )
     def test_point(self, test_input, expected):
         assert Card(*test_input).point == expected
+
+
+class TestDeck:
+    def test_len_cards(self):
+        assert len(Deck().cards) == 52
+
+    def test_shuffle(self):
+        deck = Deck()
+        cards_original = deck.cards.copy()
+
+        deck.shuffle()
+        cards_shuffled = deck.cards.copy()
+
+        assert set(cards_original) == set(cards_shuffled)
+        assert cards_original != cards_shuffled
+
+    def test_pop(self):
+        deck = Deck()
+        assert deck.pop() == Card("S", 13)
+        assert deck.pop() == Card("S", 12)
