@@ -1,15 +1,23 @@
-from blackjack.blackjack import Dealer, Deck, Player
-
-
-def draw_again():
-    return input("もう一回引きますか？ [y/n]") == "y"
+from blackjack.base import Dealer, Deck, Player
+from blackjack.strategy import ALLOWED_STRATEGIES, input_strategy, random_strategy
 
 
 def execute():
     over = False
 
+    input_ = input("Choose player strategy. [random/input] > ")
+    while input_ not in ALLOWED_STRATEGIES:
+        input_ = input(
+            f"Allowed strategies are [random/input], but given {input_}. Please choose again. > "
+        )
+
+    if input_ == "random":
+        player_strategy = random_strategy
+    else:
+        player_strategy = input_strategy
+
     deck = Deck()
-    player = Player()
+    player = Player(player_strategy)
     dealer = Dealer()
 
     deck.shuffle()
@@ -22,7 +30,7 @@ def execute():
 
     while True:
         print(f"現在の総ポイントは{player.total_points}です。")
-        if not draw_again():
+        if not player.draw_again():
             break
 
         player.draw(deck)

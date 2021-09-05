@@ -1,4 +1,5 @@
 import random
+from typing import Callable
 
 SUITS = ("H", "D", "C", "S")
 NUMBERS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
@@ -63,7 +64,8 @@ class Deck:
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, strategy: Callable):
+        self.strategy = strategy
         self.hands = []
 
     @property
@@ -87,6 +89,14 @@ class Player:
         new_card = deck.pop()
         self.hands.append(new_card)
         print(f"Playerは{new_card}を引きました。")
+
+    def draw_again(self) -> bool:
+        """もう一度デッキからカードを引くか選択する。
+
+        Returns:
+            bool: カードを引くかどうか
+        """
+        return self.strategy()
 
 
 class Dealer:

@@ -1,6 +1,6 @@
 import pytest
 
-from blackjack.blackjack import Card, Deck, Player
+from blackjack.base import Card, Deck, Player
 
 
 class TestCard:
@@ -49,7 +49,7 @@ class TestDeck:
 
 class TestPlayer:
     def test_total_points(self):
-        player = Player()
+        player = Player(lambda x: False)
         assert player.total_points == 0
 
         player.hands = [Card("H", 5), Card("S", 12)]
@@ -57,7 +57,7 @@ class TestPlayer:
 
     def test_draw(self):
         deck = Deck()
-        player = Player()
+        player = Player(lambda x: False)
 
         player.draw(deck)
         assert player.hands == [Card("S", 13)]
