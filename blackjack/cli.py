@@ -1,4 +1,4 @@
-from .blackjack import Dealer, Deck, Player
+from blackjack import Dealer, Deck, Player
 
 
 def draw_again():
@@ -6,6 +6,8 @@ def draw_again():
 
 
 def execute():
+    over = False
+
     deck = Deck()
     player = Player()
     dealer = Dealer()
@@ -19,20 +21,35 @@ def execute():
     dealer.draw(deck, display=False)
 
     while True:
-        player.draw(deck)
-
-        if player.total_points > 21:
-            break
-
         if not draw_again():
             break
 
-    while dealer.total_points < 17:
-        dealer.draw(deck)
+        player.draw(deck)
 
-    if dealer.total_points > player.total_points:
-        print("Dealerの勝ちです。")
-    elif dealer.total_points < player.total_points:
-        print("Plaeyrの勝ちです。")
-    else:
-        print("引き分けです。")
+        if player.total_points > 21:
+            print("Dealerの勝ちです。")
+            over = True
+            break
+
+    if not over:
+
+        while dealer.total_points < 17:
+            dealer.draw(deck)
+
+            if dealer.total_points > 21:
+                print("Playerの勝ちです。")
+                over = True
+                break
+
+    if not over:
+
+        if dealer.total_points > player.total_points:
+            print("Dealerの勝ちです。")
+        elif dealer.total_points < player.total_points:
+            print("Playerの勝ちです。")
+        else:
+            print("引き分けです。")
+
+
+if __name__ == "__main__":
+    execute()
