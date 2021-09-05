@@ -2,7 +2,7 @@ from blackjack.blackjack import Dealer, Deck, Player
 
 
 def draw_again():
-    return input("もう一回引きますか？ y/n") == "y"
+    return input("もう一回引きますか？ [y/n]") == "y"
 
 
 def execute():
@@ -21,6 +21,7 @@ def execute():
     dealer.draw(deck, display=False)
 
     while True:
+        print(f"現在の総ポイントは{player.total_points}です。")
         if not draw_again():
             break
 
