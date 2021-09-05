@@ -47,9 +47,15 @@ class Deck:
         self.cards = [Card(suit, n) for suit in SUITS for n in NUMBERS]
 
     def shuffle(self) -> None:
+        """デッキをシャッフルする。"""
         random.shuffle(self.cards)
 
     def pop(self) -> Card:
+        """デッキの一番上（一番後ろ）のカードを取り出す。
+
+        Returns:
+            Card: 取り出されたカード
+        """
         return self.cards.pop()
 
 
@@ -59,9 +65,19 @@ class Player:
 
     @property
     def total_points(self) -> int:
+        """プレイヤーの現在の総ポイントを取得する。
+
+        Returns:
+            int: 総ポイント
+        """
         return sum([card.point for card in self.hands])
 
     def draw(self, deck: Deck) -> None:
+        """デッキから一枚カードを引く。
+
+        Args:
+            deck (Deck): デッキ
+        """
         if not isinstance(deck, Deck):
             raise TypeError("deck must be of type Deck.")
 
@@ -76,9 +92,19 @@ class Dealer:
 
     @property
     def total_points(self) -> int:
+        """ディーラーの現在の総ポイントを取得する。
+
+        Returns:
+            int: 総ポイント
+        """
         return sum([card.point for card in self.hands])
 
     def draw(self, deck: Deck, display: bool = True) -> None:
+        """デッキから一枚カードを引く。
+
+        Args:
+            deck (Deck): デッキ
+        """
         if not isinstance(deck, Deck):
             raise TypeError("deck must be of type Deck.")
 
