@@ -24,6 +24,9 @@ class Card:
     def __hash__(self):
         return hash((self.__suit, self.__n))
 
+    def __repr__(self) -> str:
+        return f"{self.__suit}_{self.__n}"
+
     @property
     def suit(self):
         return self.__suit
