@@ -1,4 +1,4 @@
-from blackjack import Dealer, Deck, Player
+from blackjack.blackjack import Dealer, Deck, Player
 
 
 def draw_again():
@@ -49,7 +49,3 @@ def execute():
             print("Playerの勝ちです。")
         else:
             print("引き分けです。")
-
-
-if __name__ == "__main__":
-    execute()
