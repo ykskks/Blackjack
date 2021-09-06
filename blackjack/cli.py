@@ -5,10 +5,11 @@ from blackjack.strategy import ALLOWED_STRATEGIES, input_strategy, random_strate
 def execute():
     over = False
 
-    input_ = input("Choose player strategy. [random/input] > ")
+    input_ = input(f"Choose player strategy. {ALLOWED_STRATEGIES} > ")
+
     while input_ not in ALLOWED_STRATEGIES:
         input_ = input(
-            f"Allowed strategies are [random/input], but given {input_}. Please choose again. > "
+            f"Allowed strategies are {ALLOWED_STRATEGIES}, but given {input_}. Please choose again. > "
         )
 
     if input_ == "random":
