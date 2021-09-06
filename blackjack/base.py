@@ -26,6 +26,15 @@ class Card:
         return hash((self.__suit, self.__n))
 
     def __repr__(self) -> str:
+        replace_patterns = {
+            1: "A",
+            11: "J",
+            12: "Q",
+            13: "K",
+        }
+        if self.__n in replace_patterns:
+            return f"{self.__suit}_{replace_patterns[self.__n]}"
+
         return f"{self.__suit}_{self.__n}"
 
     @property
