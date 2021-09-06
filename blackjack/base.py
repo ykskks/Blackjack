@@ -26,16 +26,7 @@ class Card:
         return hash((self.__suit, self.__n))
 
     def __repr__(self) -> str:
-        replace_patterns = {
-            1: "A",
-            11: "J",
-            12: "Q",
-            13: "K",
-        }
-        if self.__n in replace_patterns:
-            return f"{self.__suit}_{replace_patterns[self.__n]}"
-
-        return f"{self.__suit}_{self.__n}"
+        return self.as_string
 
     @property
     def suit(self):
@@ -53,6 +44,24 @@ class Card:
             int: カードのポイント
         """
         return min(self.__n, 10)
+
+    @property
+    def as_string(self) -> str:
+        """このカードの文字列表現を取得する。
+
+        Returns:
+            str: カードの文字列表現
+        """
+        replace_patterns = {
+            1: "A",
+            11: "J",
+            12: "Q",
+            13: "K",
+        }
+        if self.__n in replace_patterns:
+            return f"{self.__suit}_{replace_patterns[self.__n]}"
+
+        return f"{self.__suit}_{self.__n}"
 
 
 class Deck:
