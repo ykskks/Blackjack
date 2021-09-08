@@ -8,8 +8,10 @@ setup(
     # author_email='',
     url="https://github.com/ykskks/blackjack",
     packages=find_packages(),
-    entry_points="""
-      [console_scripts]
-      bj = blackjack.cli:execute
-    """,
+    entry_points={
+        "console_scripts": [
+            "bj-play = blackjack.cli:play",
+            "bj-train = blackjack.cli:train",
+        ]
+    },
 )
