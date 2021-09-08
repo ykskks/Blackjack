@@ -54,6 +54,10 @@ class TestDeck:
         assert deck.pop() == Card("S", 12)
 
 
+class TestEnvironment:
+    pass
+
+
 class TestBasePlayer:
     def test_total_points(self):
         player = BasePlayer()
@@ -96,3 +100,7 @@ class TestDealer:
         dealer.draw(deck)
         captured = capsys.readouterr()
         assert "Dealer" in captured.out
+
+
+class TestAgent:
+    pass
