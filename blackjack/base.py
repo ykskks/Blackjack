@@ -81,6 +81,25 @@ class Deck:
         return self.cards.pop()
 
 
+class Environment:
+    """Agentの置かれた環境を表す。
+    カードの種類は区別するが、順番は区別しない。
+    相手と自分のカードは区別する。
+    """
+
+    def __init__(self, hands: list[Card], opponent_hands: list[Card]):
+        self.hands = hands
+        self.opponent_hands = opponent_hands
+
+    def __hash__(self):
+        return hash((frozenset(self.hands), frozenset(self.opponent_hands)))
+
+
+class Reward:
+    # Enum調べる
+    pass
+
+
 class BasePlayer:
     def __init__(self):
         self.hands = []
@@ -131,3 +150,29 @@ class Player(BasePlayer):
 class Dealer(BasePlayer):
     def __init__(self):
         super().__init__()
+
+
+class Agent(BasePlayer):
+    def __init__(self):
+        super().__init__()
+        self.table = {}
+
+    def accumulate_experience(self, env: Environment, reward: Reward) -> None:
+        """ゲームをプレイすることにより経験を蓄積する。"""
+        pass
+
+    def _strategy(self) -> bool:
+        """経験をもとにカードを引くかどうかの判断を行う。
+
+        Returns:
+            bool: カードを引くかどうか
+        """
+        pass
+
+    def draw_again(self, env: Environment) -> bool:
+        """もう一度デッキからカードを引くか選択する。
+
+        Returns:
+            bool: カードを引くかどうか
+        """
+        return self._strategy()
