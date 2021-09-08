@@ -81,49 +81,13 @@ class Deck:
         return self.cards.pop()
 
 
-class Player:
-    def __init__(self, strategy: Callable):
-        self.strategy = strategy
-        self.hands = []
-
-    @property
-    def total_points(self) -> int:
-        """プレイヤーの現在の総ポイントを取得する。
-
-        Returns:
-            int: 総ポイント
-        """
-        return sum([card.point for card in self.hands])
-
-    def draw(self, deck: Deck) -> None:
-        """デッキから一枚カードを引く。
-
-        Args:
-            deck (Deck): デッキ
-        """
-        if not isinstance(deck, Deck):
-            raise TypeError("deck must be of type Deck.")
-
-        new_card = deck.pop()
-        self.hands.append(new_card)
-        print(f"Playerは{new_card}を引きました。")
-
-    def draw_again(self) -> bool:
-        """もう一度デッキからカードを引くか選択する。
-
-        Returns:
-            bool: カードを引くかどうか
-        """
-        return self.strategy()
-
-
-class Dealer:
+class BasePlayer:
     def __init__(self):
         self.hands = []
 
     @property
     def total_points(self) -> int:
-        """ディーラーの現在の総ポイントを取得する。
+        """プレイヤーの現在の総ポイントを取得する。
 
         Returns:
             int: 総ポイント
@@ -139,12 +103,31 @@ class Dealer:
         if not isinstance(deck, Deck):
             raise TypeError("deck must be of type Deck.")
 
-        if not isinstance(display, bool):
-            raise TypeError("display must be of type bool.")
-
         new_card = deck.pop()
         self.hands.append(new_card)
+
+        class_name = type(self).__name__
+
         if display:
-            print(f"Dealerは{new_card}を引きました。")
+            print(f"{class_name}は{new_card}を引きました。")
         else:
-            print("Dealerはカードを引きました。")
+            print(f"{class_name}はカードを引きました。")
+
+
+class Player(BasePlayer):
+    def __init__(self, strategy: Callable):
+        super().__init__()
+        self.strategy = strategy
+
+    def draw_again(self) -> bool:
+        """もう一度デッキからカードを引くか選択する。
+
+        Returns:
+            bool: カードを引くかどうか
+        """
+        return self.strategy()
+
+
+class Dealer(BasePlayer):
+    def __init__(self):
+        super().__init__()
