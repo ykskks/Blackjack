@@ -1,6 +1,6 @@
 import pytest
 
-from blackjack.base import Card, Deck, Player
+from blackjack.base import BasePlayer, Card, Dealer, Deck, Player
 
 
 class TestCard:
@@ -26,6 +26,13 @@ class TestCard:
     def test_point(self, test_input, expected):
         assert Card(*test_input).point == expected
 
+    @pytest.mark.parametrize(
+        "test_input,expected",
+        [(("H", 3), "H_3"), (("D", 10), "D_10"), (("C", 13), "C_K")],
+    )
+    def test_as_string(self, test_input, expected):
+        assert Card(*test_input).as_string == expected
+
 
 class TestDeck:
     def test_len_cards(self):
@@ -47,9 +54,9 @@ class TestDeck:
         assert deck.pop() == Card("S", 12)
 
 
-class TestPlayer:
+class TestBasePlayer:
     def test_total_points(self):
-        player = Player(lambda x: False)
+        player = BasePlayer()
         assert player.total_points == 0
 
         player.hands = [Card("H", 5), Card("S", 12)]
@@ -57,10 +64,35 @@ class TestPlayer:
 
     def test_draw(self):
         deck = Deck()
-        player = Player(lambda x: False)
+        player = BasePlayer()
 
         player.draw(deck)
         assert player.hands == [Card("S", 13)]
 
         player.draw(deck)
         assert player.hands == [Card("S", 13), Card("S", 12)]
+
+
+class TestPlayer:
+    def test_draw_displayed_class_name(self, capsys):
+        deck = Deck()
+        player = Player(lambda: False)
+        player.draw(deck)
+        captured = capsys.readouterr()
+        assert "Player" in captured.out
+
+    def test_draw_again(self):
+        player = Player(lambda: False)
+        assert not player.draw_again()
+
+        player = Player(lambda: True)
+        assert player.draw_again()
+
+
+class TestDealer:
+    def test_draw_displayed_class_name(self, capsys):
+        deck = Deck()
+        dealer = Dealer()
+        dealer.draw(deck)
+        captured = capsys.readouterr()
+        assert "Dealer" in captured.out
