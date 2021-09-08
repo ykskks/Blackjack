@@ -2,7 +2,7 @@ from blackjack.base import Dealer, Deck, Player
 from blackjack.strategy import ALLOWED_STRATEGIES, input_strategy, random_strategy
 
 
-def execute():
+def play():
     over = False
 
     input_ = input(f"Choose player strategy. {ALLOWED_STRATEGIES} > ")
@@ -59,3 +59,7 @@ def execute():
             print("Playerの勝ちです。")
         else:
             print("引き分けです。")
+
+
+def train():
+    pass
