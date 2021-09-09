@@ -104,9 +104,10 @@ class Environment:
         return hash((frozenset(self.hands), frozenset(self.opponent_hands)))
 
 
+# TODO: enum.Enumを調べる
 class Reward:
-    # Enum調べる
-    pass
+    win = 1
+    lose = -1
 
 
 class BasePlayer:
