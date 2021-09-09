@@ -1,6 +1,6 @@
 import pytest
 
-from blackjack.base import BasePlayer, Card, Dealer, Deck, Player
+from blackjack.base import BasePlayer, Card, Dealer, Deck, Environment, Player
 
 
 class TestCard:
@@ -55,7 +55,29 @@ class TestDeck:
 
 
 class TestEnvironment:
-    pass
+    def test_eq_true(self):
+        assert Environment(
+            [Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)]
+        ) == Environment([Card("D", 5), Card("S", 13)], [Card("H", 3), Card("S", 1)])
+
+    def test_eq_false(self):
+        assert Environment(
+            [Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)]
+        ) != Environment([Card("D", 13), Card("S", 5)], [Card("H", 3), Card("S", 2)])
+
+    def test_hash_true(self):
+        assert hash(
+            Environment([Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)])
+        ) == hash(
+            Environment([Card("D", 5), Card("S", 13)], [Card("H", 3), Card("S", 1)])
+        )
+
+    def test_hash_false(self):
+        assert hash(
+            Environment([Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)])
+        ) != hash(
+            Environment([Card("D", 13), Card("S", 5)], [Card("H", 3), Card("S", 2)])
+        )
 
 
 class TestBasePlayer:

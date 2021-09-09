@@ -91,7 +91,16 @@ class Environment:
         self.hands = hands
         self.opponent_hands = opponent_hands
 
+    def __eq__(self, other):
+        # 自分のカードと相手のカードそれぞれが集合として一致するとき
+        # Agentの動作する環境が同値であるとみなす
+        return (frozenset(self.hands), frozenset(self.opponent_hands)) == (
+            frozenset(other.hands),
+            frozenset(other.opponent_hands),
+        )
+
     def __hash__(self):
+        # 自分のカード集合と相手のカード集合の組み合わせによりハッシュを計算する
         return hash((frozenset(self.hands), frozenset(self.opponent_hands)))
 
 
