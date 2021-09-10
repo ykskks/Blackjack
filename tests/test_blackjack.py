@@ -58,7 +58,7 @@ class TestEnvironment:
     def test_eq_true(self):
         assert Environment(
             [Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)]
-        ) == Environment([Card("D", 5), Card("S", 13)], [Card("H", 3), Card("S", 1)])
+        ) == Environment([Card("H", 5), Card("C", 13)], [Card("D", 3), Card("S", 1)])
 
     def test_eq_false(self):
         assert Environment(
@@ -69,7 +69,7 @@ class TestEnvironment:
         assert hash(
             Environment([Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)])
         ) == hash(
-            Environment([Card("D", 5), Card("S", 13)], [Card("H", 3), Card("S", 1)])
+            Environment([Card("H", 5), Card("C", 13)], [Card("D", 3), Card("S", 1)])
         )
 
     def test_hash_false(self):

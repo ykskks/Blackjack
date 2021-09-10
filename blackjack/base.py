@@ -83,7 +83,8 @@ class Deck:
 
 class Environment:
     """Agentの置かれた環境を表す。
-    カードの種類は区別するが、順番は区別しない。
+    カードの数字は区別するが、スートは区別しない。
+    順番は区別しない。
     相手と自分のカードは区別する。
     """
 
@@ -92,16 +93,24 @@ class Environment:
         self.opponent_hands = opponent_hands
 
     def __eq__(self, other):
-        # 自分のカードと相手のカードそれぞれが集合として一致するとき
+        # 自分のカードの数字と相手のカードの数字それぞれが集合として一致するとき
         # Agentの動作する環境が同値であるとみなす
-        return (frozenset(self.hands), frozenset(self.opponent_hands)) == (
-            frozenset(other.hands),
-            frozenset(other.opponent_hands),
+        return (
+            frozenset([c.n for c in self.hands]),
+            frozenset([c.n for c in self.opponent_hands]),
+        ) == (
+            frozenset([c.n for c in other.hands]),
+            frozenset([c.n for c in other.opponent_hands]),
         )
 
     def __hash__(self):
-        # 自分のカード集合と相手のカード集合の組み合わせによりハッシュを計算する
-        return hash((frozenset(self.hands), frozenset(self.opponent_hands)))
+        # 自分のカードの数字の集合と相手のカードの数字の集合の組み合わせによりハッシュを計算する
+        return hash(
+            (
+                frozenset([c.n for c in self.hands]),
+                frozenset([c.n for c in self.opponent_hands]),
+            )
+        )
 
 
 # TODO: enum.Enumを調べる
