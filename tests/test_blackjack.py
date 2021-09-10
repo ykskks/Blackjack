@@ -12,12 +12,12 @@ class TestCard:
         with pytest.raises(ValueError, match=r"suit must be one of.*"):
             Card("A", 5)
 
-    def test_init_n_not_int(self):
-        with pytest.raises(TypeError, match=r"n must be of type.*"):
+    def test_init_rank_not_int(self):
+        with pytest.raises(TypeError, match=r"rank must be of type.*"):
             Card("H", "5")  # type: ignore
 
-    def test_init_n_not_in_NUMBERS(self):
-        with pytest.raises(ValueError, match=r"n must be one of.*"):
+    def test_init_rank_not_in_RANKS(self):
+        with pytest.raises(ValueError, match=r"rank must be one of.*"):
             Card("H", 0)
 
     @pytest.mark.parametrize(

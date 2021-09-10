@@ -2,28 +2,28 @@ import random
 from typing import Callable
 
 SUITS = ("H", "D", "C", "S")
-NUMBERS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+RANKS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
 
 
 class Card:
-    def __init__(self, suit: str, n: int):
+    def __init__(self, suit: str, rank: int):
         if not isinstance(suit, str):
             raise TypeError("suit must be of type str.")
         elif suit not in SUITS:
             raise ValueError(f"suit must be one of {SUITS}.")
         self.__suit = suit
 
-        if not isinstance(n, int):
-            raise TypeError("n must be of type int.")
-        elif n not in NUMBERS:
-            raise ValueError(f"n must be one of {NUMBERS}.")
-        self.__n = n
+        if not isinstance(rank, int):
+            raise TypeError("rank must be of type int.")
+        elif rank not in RANKS:
+            raise ValueError(f"rank must be one of {RANKS}.")
+        self.__rank = rank
 
     def __eq__(self, other):
-        return (self.__suit, self.__n) == (other.__suit, other.__n)
+        return (self.__suit, self.__rank) == (other.__suit, other.__rank)
 
     def __hash__(self):
-        return hash((self.__suit, self.__n))
+        return hash((self.__suit, self.__rank))
 
     def __repr__(self) -> str:
         return self.as_string
@@ -33,8 +33,8 @@ class Card:
         return self.__suit
 
     @property
-    def n(self):
-        return self.__n
+    def rank(self):
+        return self.__rank
 
     @property
     def point(self) -> int:
@@ -43,7 +43,7 @@ class Card:
         Returns:
             int: カードのポイント
         """
-        return min(self.__n, 10)
+        return min(self.__rank, 10)
 
     @property
     def as_string(self) -> str:
@@ -58,15 +58,15 @@ class Card:
             12: "Q",
             13: "K",
         }
-        if self.__n in replace_patterns:
-            return f"{self.__suit}_{replace_patterns[self.__n]}"
+        if self.__rank in replace_patterns:
+            return f"{self.__suit}_{replace_patterns[self.__rank]}"
 
-        return f"{self.__suit}_{self.__n}"
+        return f"{self.__suit}_{self.__rank}"
 
 
 class Deck:
     def __init__(self):
-        self.cards = [Card(suit, n) for suit in SUITS for n in NUMBERS]
+        self.cards = [Card(suit, rank) for suit in SUITS for rank in RANKS]
 
     def shuffle(self) -> None:
         """デッキをシャッフルする。"""
@@ -93,22 +93,22 @@ class Environment:
         self.opponent_hands = opponent_hands
 
     def __eq__(self, other):
-        # 自分のカードの数字と相手のカードの数字それぞれが集合として一致するとき
+        # 自分のカードのランクと相手のカードのランクそれぞれが集合として一致するとき
         # Agentの動作する環境が同値であるとみなす
         return (
-            frozenset([c.n for c in self.hands]),
-            frozenset([c.n for c in self.opponent_hands]),
+            frozenset([c.rank for c in self.hands]),
+            frozenset([c.rank for c in self.opponent_hands]),
         ) == (
-            frozenset([c.n for c in other.hands]),
-            frozenset([c.n for c in other.opponent_hands]),
+            frozenset([c.rank for c in other.hands]),
+            frozenset([c.rank for c in other.opponent_hands]),
         )
 
     def __hash__(self):
-        # 自分のカードの数字の集合と相手のカードの数字の集合の組み合わせによりハッシュを計算する
+        # 自分のカードのランクの集合と相手のカードのランクの集合の組み合わせによりハッシュを計算する
         return hash(
             (
-                frozenset([c.n for c in self.hands]),
-                frozenset([c.n for c in self.opponent_hands]),
+                frozenset([c.rank for c in self.hands]),
+                frozenset([c.rank for c in self.opponent_hands]),
             )
         )
 
