@@ -1,5 +1,6 @@
 import enum
 import random
+from collections import defaultdict
 from typing import Callable
 
 SUITS = ("H", "D", "C", "S")
@@ -119,8 +120,9 @@ class Action(enum.Enum):
     stand = enum.auto()
 
 
-class Reward:
+class Reward(enum.IntEnum):
     win = 1
+    draw = 0
     lose = -1
 
 
@@ -176,13 +178,41 @@ class Dealer(BasePlayer):
         super().__init__()
 
 
+class Table:
+    """あるEnvironmentにおけるActionの評価値を保存する。
+    過去のEnvironmentとActionペアに関する全Rewardを平均したものが、
+    現在の評価値となる。
+    """
+
+    def __init__(self):
+        # 全てのEnvironment, Actionペアに対してゼロで初期化する
+        # ref: https://stackoverflow.com/questions/5029934/defaultdict-of-defaultdict
+        self._table = defaultdict(lambda: defaultdict(float))
+        self._count = defaultdict(lambda: defaultdict(int))
+
+    def update(self, envs: list[Environment], actions: list[Action], reward: Reward):
+        for env, action in zip(envs, actions):
+            old_value = self._table[env][action]
+            old_count = self._count[env][action]
+            # 同一のEnvironmentとActionのペアに関して全期間のRewardの平均をとる
+            self._table[env][action] = (old_value * old_count + reward.value) / (
+                old_count + 1
+            )
+            self._count[env][action] += 1
+
+    def __getitem__(self, key):
+        return self._table[key]
+
+
 class Agent(BasePlayer):
     def __init__(self):
         super().__init__()
-        self.table = {}
+        self.table = Table()
 
     def register_experience(self, env: Environment, reward: Reward) -> None:
-        """ゲームをプレイすることにより経験を蓄積する。"""
+        """勝敗決定時にそれまでにAgentがとったEnvironmentと
+        Actionのペアに対してRewardを割り当ててTableを更新する。
+        """
         pass
 
     def _strategy(self) -> bool:

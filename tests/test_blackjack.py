@@ -1,6 +1,17 @@
 import pytest
 
-from blackjack.base import BasePlayer, Card, Dealer, Deck, Environment, Player
+from blackjack.base import (
+    Action,
+    Agent,
+    BasePlayer,
+    Card,
+    Dealer,
+    Deck,
+    Environment,
+    Player,
+    Reward,
+    Table,
+)
 
 
 class TestCard:
@@ -124,5 +135,43 @@ class TestDealer:
         assert "Dealer" in captured.out
 
 
+@pytest.fixture
+def envs():
+    return [
+        Environment([Card("S", 2), Card("S", 12)], [Card("H", 4)]),
+        Environment([Card("S", 2), Card("S", 12), Card("D", 1)], [Card("H", 4)]),
+    ]
+
+
+@pytest.fixture
+def actions():
+    return [Action.draw, Action.stand]
+
+
+class TestTable:
+    def test_update_single(self, envs, actions):
+        table = Table()
+
+        table.update(envs, actions, Reward.win)
+
+        for env, action in zip(envs, actions):
+            assert table[env][action] == 1
+
+    def test_update_multiple(self, envs, actions):
+        table = Table()
+
+        table.update(envs, actions, Reward.win)
+        table.update(envs, actions, Reward.draw)
+        table.update(envs, actions, Reward.win)
+        table.update(envs, actions, Reward.lose)
+
+        for env, action in zip(envs, actions):
+            assert table[env][action] == (1 + 0 + 1 - 1) / 4
+
+
 class TestAgent:
-    pass
+    def test_register_experience(self):
+        pass
+
+    def test_strategy(self):
+        pass
