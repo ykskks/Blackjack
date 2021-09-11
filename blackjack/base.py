@@ -1,3 +1,4 @@
+import enum
 import random
 from typing import Callable
 
@@ -113,7 +114,11 @@ class Environment:
         )
 
 
-# TODO: enum.Enumを調べる
+class Action(enum.Enum):
+    draw = enum.auto()
+    stand = enum.auto()
+
+
 class Reward:
     win = 1
     lose = -1
@@ -176,7 +181,7 @@ class Agent(BasePlayer):
         super().__init__()
         self.table = {}
 
-    def accumulate_experience(self, env: Environment, reward: Reward) -> None:
+    def register_experience(self, env: Environment, reward: Reward) -> None:
         """ゲームをプレイすることにより経験を蓄積する。"""
         pass
 
