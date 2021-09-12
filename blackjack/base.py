@@ -150,7 +150,7 @@ class BasePlayer:
         """
         return sum([card.point for card in self.hands])
 
-    def draw(self, deck: Deck, display: bool = True) -> None:
+    def draw(self, deck: Deck, display_card: bool = True, verbose: bool = True) -> None:
         """デッキから一枚カードを引く。
 
         Args:
@@ -161,10 +161,11 @@ class BasePlayer:
 
         class_name = type(self).__name__
 
-        if display:
-            print(f"{class_name}は{new_card}を引きました。")
-        else:
-            print(f"{class_name}はカードを引きました。")
+        if verbose:
+            if display_card:
+                print(f"{class_name}は{new_card}を引きました。")
+            else:
+                print(f"{class_name}はカードを引きました。")
 
 
 class Player(BasePlayer):
