@@ -122,7 +122,7 @@ class Action(enum.Enum):
 
 class Reward(enum.IntEnum):
     win = 1
-    draw = 0
+    tie = 0
     lose = -1
 
 
@@ -190,7 +190,9 @@ class Table:
         self._table = defaultdict(lambda: defaultdict(float))
         self._count = defaultdict(lambda: defaultdict(int))
 
-    def update(self, envs: list[Environment], actions: list[Action], reward: Reward):
+    def update(
+        self, envs: list[Environment], actions: list[Action], reward: Reward
+    ) -> None:
         for env, action in zip(envs, actions):
             old_value = self._table[env][action]
             old_count = self._count[env][action]
@@ -200,7 +202,7 @@ class Table:
             )
             self._count[env][action] += 1
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> defaultdict[Action, float]:
         return self._table[key]
 
 
@@ -209,19 +211,35 @@ class Agent(BasePlayer):
         super().__init__()
         self.table = Table()
 
-    def register_experience(self, env: Environment, reward: Reward) -> None:
+    def register_experience(
+        self, envs: list[Environment], actions: list[Action], reward: Reward
+    ) -> None:
         """勝敗決定時にそれまでにAgentがとったEnvironmentと
         Actionのペアに対してRewardを割り当ててTableを更新する。
         """
-        pass
+        self.table.update(envs, actions, reward)
 
-    def _strategy(self) -> bool:
-        """経験をもとにカードを引くかどうかの判断を行う。
+    def _strategy(self, env: Environment) -> Action:
+        """過去のRewardをもとに、このEnvironmentに対する
+        Rewardの平均値が高いActionを返す。
+
+        Args:
+            env (Environment): Agentの置かれた環境
 
         Returns:
-            bool: カードを引くかどうか
+            Action: Rewardの平均値が高いAction
         """
-        pass
+        scores = self.table[env]
+
+        # Actionの評価値が同じ場合はランダムに選ぶ
+        if scores[Action.draw] == scores[Action.stand]:
+            if random.random() > 0.5:
+                return Action.draw
+            else:
+                return Action.stand
+
+        # 最大のvalueをもつkeyを返す
+        return max(scores, key=scores.get)  # type: ignore
 
     def draw_again(self, env: Environment) -> bool:
         """もう一度デッキからカードを引くか選択する。
@@ -229,4 +247,5 @@ class Agent(BasePlayer):
         Returns:
             bool: カードを引くかどうか
         """
-        return self._strategy()
+        selected_action = self._strategy(env)
+        return selected_action == Action.draw

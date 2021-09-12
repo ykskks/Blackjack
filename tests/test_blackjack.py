@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from blackjack.base import (
@@ -161,7 +163,7 @@ class TestTable:
         table = Table()
 
         table.update(envs, actions, Reward.win)
-        table.update(envs, actions, Reward.draw)
+        table.update(envs, actions, Reward.tie)
         table.update(envs, actions, Reward.win)
         table.update(envs, actions, Reward.lose)
 
@@ -170,8 +172,67 @@ class TestTable:
 
 
 class TestAgent:
-    def test_register_experience(self):
-        pass
+    def test_strategy_one_is_better(self, envs, actions):
+        agent = Agent()
 
-    def test_strategy(self):
-        pass
+        agent.register_experience(envs, actions, Reward.win)
+        agent.register_experience(envs, actions, Reward.tie)
+        agent.register_experience(envs, actions, Reward.win)
+
+        for env, action in zip(envs, actions):
+            # 一方のActionの評価値が高い場合は常にそちらが選ばれる
+            assert agent._strategy(env) == action
+
+    def test_strategy_random_draw(self, envs, actions, monkeypatch):
+        agent = Agent()
+
+        agent.register_experience(envs, actions, Reward.tie)
+
+        # 両方のActionの評価値が等しい場合にはランダムに選ばれる
+        # random.uniform() > 0.5ならdraw
+        monkeypatch.setattr(random, "random", lambda: 0.7)
+        for env in envs:
+            assert agent._strategy(env) == Action.draw
+
+    def test_strategy_random_stand(self, envs, actions, monkeypatch):
+        agent = Agent()
+
+        agent.register_experience(envs, actions, Reward.tie)
+
+        # 両方のActionの評価値が等しい場合にはランダムに選ばれる
+        # random.uniform() <= 0.5ならstand
+        monkeypatch.setattr(random, "random", lambda: 0.2)
+        for env in envs:
+            assert agent._strategy(env) == Action.stand
+
+    def test_draw_again_one_is_better(self, envs, actions):
+        agent = Agent()
+
+        agent.register_experience(envs, actions, Reward.win)
+        agent.register_experience(envs, actions, Reward.tie)
+        agent.register_experience(envs, actions, Reward.win)
+
+        assert agent.draw_again(envs[0])
+        assert not agent.draw_again(envs[1])
+
+    def test_draw_again_random_draw(self, envs, actions, monkeypatch):
+        agent = Agent()
+
+        agent.register_experience(envs, actions, Reward.tie)
+
+        # 両方のActionの評価値が等しい場合にはランダムに選ばれる
+        # random.uniform() > 0.5ならdraw
+        monkeypatch.setattr(random, "random", lambda: 0.7)
+        for env in envs:
+            assert agent.draw_again(env)
+
+    def test_draw_again_random_stand(self, envs, actions, monkeypatch):
+        agent = Agent()
+
+        agent.register_experience(envs, actions, Reward.tie)
+
+        # 両方のActionの評価値が等しい場合にはランダムに選ばれる
+        # random.uniform() <= 0.5ならstand
+        monkeypatch.setattr(random, "random", lambda: 0.2)
+        for env in envs:
+            assert not agent.draw_again(env)
