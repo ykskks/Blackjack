@@ -11,37 +11,32 @@ from blackjack.base import (
     Deck,
     Environment,
     Player,
+    Rank,
     Reward,
+    Suit,
     Table,
 )
 
 
 class TestCard:
-    def test_init_suit_not_str(self):
-        with pytest.raises(TypeError, match=r"suit must be of type.*"):
-            Card(1, 5)  # type: ignore
-
-    def test_init_suit_not_in_SUITS(self):
-        with pytest.raises(ValueError, match=r"suit must be one of.*"):
-            Card("A", 5)
-
-    def test_init_rank_not_int(self):
-        with pytest.raises(TypeError, match=r"rank must be of type.*"):
-            Card("H", "5")  # type: ignore
-
-    def test_init_rank_not_in_RANKS(self):
-        with pytest.raises(ValueError, match=r"rank must be one of.*"):
-            Card("H", 0)
-
     @pytest.mark.parametrize(
-        "test_input,expected", [(("H", 3), 3), (("D", 10), 10), (("C", 13), 10)]
+        "test_input,expected",
+        [
+            ((Suit.heart, Rank.three), 3),
+            ((Suit.diamond, Rank.ten), 10),
+            ((Suit.club, Rank.king), 10),
+        ],
     )
     def test_point(self, test_input, expected):
         assert Card(*test_input).point == expected
 
     @pytest.mark.parametrize(
         "test_input,expected",
-        [(("H", 3), "H_3"), (("D", 10), "D_10"), (("C", 13), "C_K")],
+        [
+            ((Suit.heart, Rank.three), "heart_3"),
+            ((Suit.diamond, Rank.ten), "diamond_10"),
+            ((Suit.club, Rank.king), "club_K"),
+        ],
     )
     def test_as_string(self, test_input, expected):
         assert Card(*test_input).as_string == expected
@@ -63,33 +58,53 @@ class TestDeck:
 
     def test_pop(self):
         deck = Deck()
-        assert deck.pop() == Card("S", 13)
-        assert deck.pop() == Card("S", 12)
+        assert deck.pop() == Card(Suit.spade, Rank.king)
+        assert deck.pop() == Card(Suit.spade, Rank.queen)
 
 
 class TestEnvironment:
     def test_eq_true(self):
         assert Environment(
-            [Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)]
-        ) == Environment([Card("H", 5), Card("C", 13)], [Card("D", 3), Card("S", 1)])
+            [Card(Suit.spade, Rank.king), Card(Suit.diamond, Rank.five)],
+            [Card(Suit.spade, Rank.ace), Card(Suit.heart, Rank.three)],
+        ) == Environment(
+            [Card(Suit.heart, Rank.five), Card(Suit.club, Rank.king)],
+            [Card(Suit.diamond, Rank.three), Card(Suit.spade, Rank.ace)],
+        )
 
     def test_eq_false(self):
         assert Environment(
-            [Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)]
-        ) != Environment([Card("D", 13), Card("S", 5)], [Card("H", 3), Card("S", 2)])
+            [Card(Suit.spade, Rank.king), Card(Suit.diamond, Rank.five)],
+            [Card(Suit.spade, Rank.ace), Card(Suit.heart, Rank.three)],
+        ) != Environment(
+            [Card(Suit.diamond, Rank.king), Card(Suit.spade, Rank.five)],
+            [Card(Suit.heart, Rank.three), Card(Suit.spade, Rank.two)],
+        )
 
     def test_hash_true(self):
         assert hash(
-            Environment([Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)])
+            Environment(
+                [Card(Suit.spade, Rank.king), Card(Suit.diamond, Rank.five)],
+                [Card(Suit.spade, Rank.ace), Card(Suit.heart, Rank.three)],
+            )
         ) == hash(
-            Environment([Card("H", 5), Card("C", 13)], [Card("D", 3), Card("S", 1)])
+            Environment(
+                [Card(Suit.heart, Rank.five), Card(Suit.club, Rank.king)],
+                [Card(Suit.diamond, Rank.three), Card(Suit.spade, Rank.ace)],
+            )
         )
 
     def test_hash_false(self):
         assert hash(
-            Environment([Card("S", 13), Card("D", 5)], [Card("S", 1), Card("H", 3)])
+            Environment(
+                [Card(Suit.spade, Rank.king), Card(Suit.diamond, Rank.five)],
+                [Card(Suit.spade, Rank.ace), Card(Suit.heart, Rank.three)],
+            )
         ) != hash(
-            Environment([Card("D", 13), Card("S", 5)], [Card("H", 3), Card("S", 2)])
+            Environment(
+                [Card(Suit.diamond, Rank.king), Card(Suit.spade, Rank.five)],
+                [Card(Suit.heart, Rank.three), Card(Suit.spade, Rank.two)],
+            )
         )
 
 
@@ -98,7 +113,7 @@ class TestBasePlayer:
         player = BasePlayer()
         assert player.total_points == 0
 
-        player.hands = [Card("H", 5), Card("S", 12)]
+        player.hands = [Card(Suit.heart, Rank.five), Card(Suit.spade, Rank.queen)]
         assert player.total_points == 15
 
     def test_draw(self):
@@ -106,10 +121,13 @@ class TestBasePlayer:
         player = BasePlayer()
 
         player.draw(deck)
-        assert player.hands == [Card("S", 13)]
+        assert player.hands == [Card(Suit.spade, Rank.king)]
 
         player.draw(deck)
-        assert player.hands == [Card("S", 13), Card("S", 12)]
+        assert player.hands == [
+            Card(Suit.spade, Rank.king),
+            Card(Suit.spade, Rank.queen),
+        ]
 
 
 class TestPlayer:
@@ -140,8 +158,18 @@ class TestDealer:
 @pytest.fixture
 def envs():
     return [
-        Environment([Card("S", 2), Card("S", 12)], [Card("H", 4)]),
-        Environment([Card("S", 2), Card("S", 12), Card("D", 1)], [Card("H", 4)]),
+        Environment(
+            [Card(Suit.spade, Rank.two), Card(Suit.spade, Rank.queen)],
+            [Card(Suit.heart, Rank.four)],
+        ),
+        Environment(
+            [
+                Card(Suit.spade, Rank.two),
+                Card(Suit.spade, Rank.queen),
+                Card(Suit.diamond, Rank.ace),
+            ],
+            [Card(Suit.heart, Rank.four)],
+        ),
     ]
 
 
@@ -189,7 +217,7 @@ class TestAgent:
         agent.register_experience(envs, actions, Reward.tie)
 
         # 両方のActionの評価値が等しい場合にはランダムに選ばれる
-        # random.uniform() > 0.5ならdraw
+        # random.uniform() > 0.Rank.fiveならdraw
         monkeypatch.setattr(random, "random", lambda: 0.7)
         for env in envs:
             assert agent._strategy(env) == Action.draw
@@ -200,7 +228,7 @@ class TestAgent:
         agent.register_experience(envs, actions, Reward.tie)
 
         # 両方のActionの評価値が等しい場合にはランダムに選ばれる
-        # random.uniform() <= 0.5ならstand
+        # random.uniform() <= 0.Rank.fiveならstand
         monkeypatch.setattr(random, "random", lambda: 0.2)
         for env in envs:
             assert agent._strategy(env) == Action.stand
@@ -221,7 +249,7 @@ class TestAgent:
         agent.register_experience(envs, actions, Reward.tie)
 
         # 両方のActionの評価値が等しい場合にはランダムに選ばれる
-        # random.uniform() > 0.5ならdraw
+        # random.uniform() > 0.Rank.fiveならdraw
         monkeypatch.setattr(random, "random", lambda: 0.7)
         for env in envs:
             assert agent.draw_again(env)
@@ -232,7 +260,7 @@ class TestAgent:
         agent.register_experience(envs, actions, Reward.tie)
 
         # 両方のActionの評価値が等しい場合にはランダムに選ばれる
-        # random.uniform() <= 0.5ならstand
+        # random.uniform() <= 0.Rank.fiveならstand
         monkeypatch.setattr(random, "random", lambda: 0.2)
         for env in envs:
             assert not agent.draw_again(env)

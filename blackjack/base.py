@@ -3,22 +3,33 @@ import random
 from collections import defaultdict
 from typing import Callable
 
-SUITS = ("H", "D", "C", "S")
-RANKS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+
+class Suit(enum.Enum):
+    heart = enum.auto()
+    diamond = enum.auto()
+    club = enum.auto()
+    spade = enum.auto()
+
+
+class Rank(enum.IntEnum):
+    ace = 1
+    two = 2
+    three = 3
+    four = 4
+    five = 5
+    six = 6
+    seven = 7
+    eight = 8
+    nine = 9
+    ten = 10
+    jack = 11
+    queen = 12
+    king = 13
 
 
 class Card:
-    def __init__(self, suit: str, rank: int):
-        if not isinstance(suit, str):
-            raise TypeError("suit must be of type str.")
-        elif suit not in SUITS:
-            raise ValueError(f"suit must be one of {SUITS}.")
+    def __init__(self, suit: Suit, rank: Rank):
         self.__suit = suit
-
-        if not isinstance(rank, int):
-            raise TypeError("rank must be of type int.")
-        elif rank not in RANKS:
-            raise ValueError(f"rank must be one of {RANKS}.")
         self.__rank = rank
 
     def __eq__(self, other):
@@ -61,14 +72,14 @@ class Card:
             13: "K",
         }
         if self.__rank in replace_patterns:
-            return f"{self.__suit}_{replace_patterns[self.__rank]}"
+            return f"{self.__suit.name}_{replace_patterns[self.__rank]}"
 
-        return f"{self.__suit}_{self.__rank}"
+        return f"{self.__suit.name}_{self.__rank}"
 
 
 class Deck:
     def __init__(self):
-        self.cards = [Card(suit, rank) for suit in SUITS for rank in RANKS]
+        self.cards = [Card(suit, rank) for suit in Suit for rank in Rank]
 
     def shuffle(self) -> None:
         """デッキをシャッフルする。"""
@@ -145,9 +156,6 @@ class BasePlayer:
         Args:
             deck (Deck): デッキ
         """
-        if not isinstance(deck, Deck):
-            raise TypeError("deck must be of type Deck.")
-
         new_card = deck.pop()
         self.hands.append(new_card)
 
