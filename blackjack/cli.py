@@ -1,4 +1,6 @@
-from blackjack.base import Dealer, Deck, Player
+from tqdm import tqdm
+
+from blackjack.base import Action, Agent, Dealer, Deck, Environment, Player, Reward
 from blackjack.strategy import ALLOWED_STRATEGIES, input_strategy, random_strategy
 
 
@@ -27,7 +29,7 @@ def play():
     dealer.draw(deck)
 
     player.draw(deck)
-    dealer.draw(deck, display=False)
+    dealer.draw(deck, display_card=False)
 
     while True:
         print(f"現在の総ポイントは{player.total_points}です。")
@@ -62,4 +64,107 @@ def play():
 
 
 def train():
-    pass
+    num_plays_train = 100
+    num_plays_test = 1000
+    agent = Agent()
+
+    for _ in tqdm(range(num_plays_train), desc="Training..."):
+        over = False
+        deck = Deck()
+        dealer = Dealer()
+        envs = []
+        actions = []
+
+        deck.shuffle()
+
+        agent.draw(deck, verbose=False)
+        dealer.draw(deck, verbose=False)
+
+        agent.draw(deck, verbose=False)
+        dealer.draw(deck, verbose=False)
+
+        envs.append(Environment(agent.hands, dealer.hands))
+
+        while True:
+            if not agent.draw_again(envs[-1]):
+                actions.append(Action.stand)
+                break
+
+            agent.draw(deck, verbose=False)
+            actions.append(Action.draw)
+
+            envs.append(Environment(agent.hands, dealer.hands))
+
+            if agent.total_points > 21:
+                over = True
+                agent.register_experience(envs, actions, Reward.lose)
+                break
+
+        if not over:
+
+            while dealer.total_points < 17:
+                dealer.draw(deck, verbose=False)
+
+                if dealer.total_points > 21:
+                    over = True
+                    agent.register_experience(envs, actions, Reward.win)
+                    break
+
+        if not over:
+
+            if dealer.total_points > agent.total_points:
+                agent.register_experience(envs, actions, Reward.lose)
+            elif dealer.total_points < agent.total_points:
+                agent.register_experience(envs, actions, Reward.win)
+            else:
+                agent.register_experience(envs, actions, Reward.tie)
+
+    win_count = 0
+    for _ in tqdm(range(num_plays_test), desc="Testing..."):
+        over = False
+        deck = Deck()
+        dealer = Dealer()
+        envs = []
+
+        deck.shuffle()
+
+        agent.draw(deck, verbose=False)
+        dealer.draw(deck, verbose=False)
+
+        agent.draw(deck, verbose=False)
+        dealer.draw(deck, verbose=False)
+
+        envs.append(Environment(agent.hands, dealer.hands))
+
+        while True:
+            if not agent.draw_again(envs[-1]):
+                break
+
+            agent.draw(deck, verbose=False)
+
+            envs.append(Environment(agent.hands, dealer.hands))
+
+            if agent.total_points > 21:
+                over = True
+                break
+
+        if not over:
+
+            while dealer.total_points < 17:
+                dealer.draw(deck, verbose=False)
+
+                if dealer.total_points > 21:
+                    over = True
+                    win_count += 1
+                    break
+
+        if not over:
+
+            if dealer.total_points > agent.total_points:
+                pass
+            elif dealer.total_points < agent.total_points:
+                win_count += 1
+            else:
+                pass
+
+    print(f"Agentの勝率: {win_count / num_plays_test:.3f}")
