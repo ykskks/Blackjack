@@ -64,7 +64,7 @@ def play():
 
 
 def train():
-    num_plays_train = 100
+    num_plays_train = 1000
     num_plays_test = 1000
     agent = Agent()
 
@@ -72,6 +72,7 @@ def train():
         over = False
         deck = Deck()
         dealer = Dealer()
+        agent.reset_hands()
         envs = []
         actions = []
 
@@ -124,6 +125,7 @@ def train():
         over = False
         deck = Deck()
         dealer = Dealer()
+        agent.reset_hands()
         envs = []
 
         deck.shuffle()
@@ -168,3 +170,5 @@ def train():
                 pass
 
     print(f"Agentの勝率: {win_count / num_plays_test:.3f}")
+
+    agent.table.show()

@@ -125,6 +125,13 @@ class Environment:
             )
         )
 
+    def __repr__(self):
+        hands = [c.suit.name + "_" + str(c.rank.value) for c in self.hands]
+        opponent_hands = [
+            c.suit.name + "_" + str(c.rank.value) for c in self.opponent_hands
+        ]
+        return f"Environment({hands}, {opponent_hands})"
+
 
 class Action(enum.Enum):
     draw = enum.auto()
@@ -214,11 +221,32 @@ class Table:
     def __getitem__(self, key) -> defaultdict[Action, float]:
         return self._table[key]
 
+    def show(self, k=5) -> None:
+        """現在の評価値テーブルを表示する。
+        k個のEnvironmentにおける各Actionの評価値を表示する。
+
+        Args:
+            k (int, optional): いくつのEnvironmentに関して表示するか. Defaults to 5.
+
+        """
+        envs = random.sample(list(self._table), 10)
+        values = [self._table[env] for env in envs]
+        for env, value in zip(envs, values):
+            print(env)
+            print(value)
+            print("-" * 100)
+
 
 class Agent(BasePlayer):
     def __init__(self):
         super().__init__()
         self.table = Table()
+
+    def reset_hands(self) -> None:
+        """新しいゲームをプレイする際に、
+        過去のゲームで引いたカードの情報を削除する。
+        """
+        self.hands = []
 
     def register_experience(
         self, envs: list[Environment], actions: list[Action], reward: Reward
