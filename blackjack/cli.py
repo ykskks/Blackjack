@@ -84,7 +84,8 @@ def train():
         agent.draw(deck, verbose=False)
         dealer.draw(deck, verbose=False)
 
-        envs.append(Environment(agent.hands, dealer.hands))
+        # dealerの2枚目はagentには見えない
+        envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
         while True:
             if not agent.draw_again(envs[-1]):
@@ -94,7 +95,7 @@ def train():
             agent.draw(deck, verbose=False)
             actions.append(Action.draw)
 
-            envs.append(Environment(agent.hands, dealer.hands))
+            envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
             if agent.total_points > 21:
                 over = True
