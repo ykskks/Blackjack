@@ -229,7 +229,7 @@ class Table:
             k (int, optional): いくつのEnvironmentに関して表示するか. Defaults to 5.
 
         """
-        envs = random.sample(list(self._table), 10)
+        envs = random.sample(list(self._table), k)
         values = [self._table[env] for env in envs]
         for env, value in zip(envs, values):
             print(env)
