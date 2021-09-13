@@ -95,12 +95,12 @@ def train():
             agent.draw(deck, verbose=False)
             actions.append(Action.draw)
 
-            envs.append(Environment(agent.hands, dealer.hands[:-1]))
-
             if agent.total_points > 21:
                 over = True
                 agent.register_experience(envs, actions, Reward.lose)
                 break
+
+            envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
         if not over:
 
@@ -121,6 +121,8 @@ def train():
             else:
                 agent.register_experience(envs, actions, Reward.tie)
 
+    agent.table.show()
+
     win_count = 0
     for _ in tqdm(range(num_plays_test), desc="Testing..."):
         over = False
@@ -137,7 +139,7 @@ def train():
         agent.draw(deck, verbose=False)
         dealer.draw(deck, verbose=False)
 
-        envs.append(Environment(agent.hands, dealer.hands))
+        envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
         while True:
             if not agent.draw_again(envs[-1]):
@@ -145,11 +147,11 @@ def train():
 
             agent.draw(deck, verbose=False)
 
-            envs.append(Environment(agent.hands, dealer.hands))
-
             if agent.total_points > 21:
                 over = True
                 break
+
+            envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
         if not over:
 
@@ -171,5 +173,3 @@ def train():
                 pass
 
     print(f"Agentの勝率: {win_count / num_plays_test:.3f}")
-
-    agent.table.show()
