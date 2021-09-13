@@ -102,8 +102,8 @@ class Environment:
     """
 
     def __init__(self, hands: list[Card], opponent_hands: list[Card]):
-        self.hands = hands
-        self.opponent_hands = opponent_hands
+        self.hands = tuple(hands)  # immutable
+        self.opponent_hands = tuple(opponent_hands)
 
     def __eq__(self, other):
         # 自分のカードのランクと相手のカードのランクそれぞれが集合として一致するとき
