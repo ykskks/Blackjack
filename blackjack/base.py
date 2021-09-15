@@ -232,11 +232,14 @@ class Table:
         envs = random.sample(list(self._table), k)
         values = [self._table[env] for env in envs]
         counts = [self._count[env] for env in envs]
+
+        print("\nShowing table after training...\n")
+
         for env, value, count in zip(envs, values, counts):
             print(env)
-            print(count)
-            print(value)
-            print("-" * 100)
+            print("Count of each action taken:", dict(count))
+            print("Average reward of each action:", dict(value))
+            print("\n" + "-" * 100 + "\n")
 
 
 class Agent(BasePlayer):
