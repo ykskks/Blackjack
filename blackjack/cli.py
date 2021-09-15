@@ -1,3 +1,5 @@
+import random
+
 from tqdm import tqdm
 
 from blackjack.base import Action, Agent, Dealer, Deck, Environment, Player, Reward
@@ -64,11 +66,15 @@ def play():
 
 
 def train():
-    num_plays_train = 1000
+    num_plays_train = 1000000
+    num_explores = 500000
     num_plays_test = 1000
     agent = Agent()
 
-    for _ in tqdm(range(num_plays_train), desc="Training..."):
+    epsilon = 0.8
+    factor = 0.99
+
+    for episode in tqdm(range(num_plays_train), desc="Training..."):
         over = False
         deck = Deck()
         dealer = Dealer()
@@ -88,9 +94,13 @@ def train():
         envs.append(Environment(agent.hands, dealer.hands[:-1]))
 
         while True:
-            if not agent.draw_again(envs[-1]):
-                actions.append(Action.stand)
-                break
+            # Epsilon-Greedy
+            if random.random() < epsilon:
+                random_strategy()
+            else:
+                if not agent.draw_again(envs[-1]):
+                    actions.append(Action.stand)
+                    break
 
             agent.draw(deck, verbose=False)
             actions.append(Action.draw)
@@ -120,6 +130,9 @@ def train():
                 agent.register_experience(envs, actions, Reward.win)
             else:
                 agent.register_experience(envs, actions, Reward.tie)
+
+        if episode > num_explores:
+            epsilon *= factor
 
     agent.table.show()
 
