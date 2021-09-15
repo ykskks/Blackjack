@@ -156,6 +156,22 @@ class TestDealer:
 
 
 @pytest.fixture
+def env():
+    return Environment(
+        [Card(Suit.spade, Rank.two), Card(Suit.spade, Rank.queen)],
+        [Card(Suit.heart, Rank.four)],
+    )
+
+
+@pytest.fixture
+def env_swapped():
+    return Environment(
+        [Card(Suit.spade, Rank.queen), Card(Suit.spade, Rank.two)],
+        [Card(Suit.heart, Rank.four)],
+    )
+
+
+@pytest.fixture
 def envs():
     return [
         Environment(
@@ -197,6 +213,28 @@ class TestTable:
 
         for env, action in zip(envs, actions):
             assert table[env][action] == (1 + 0 + 1 - 1) / 4
+
+    def test_different_environment_with_same_key(self, env, env_swapped):
+        table = Table()
+
+        table._table[env][Action.draw] = 1.0
+        assert table._table[env_swapped][Action.draw] == 1.0
+
+        table._table[env_swapped][Action.draw] += 1.0
+        assert table._table[env][Action.draw] == 2.0
+
+    def test_different_environment_with_same_total_points(self, env):
+        table = Table()
+        env_same_total_points = Environment(
+            [Card(Suit.spade, Rank.two), Card(Suit.spade, Rank.king)],
+            [Card(Suit.heart, Rank.four)],
+        )
+
+        table._table[env][Action.draw] = 1.0
+        assert table._table[env_same_total_points][Action.draw] != 1.0
+
+        table._table[env_same_total_points][Action.draw] = -1.0
+        assert table._table[env][Action.draw] != -1.0
 
 
 class TestAgent:
