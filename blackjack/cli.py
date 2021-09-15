@@ -66,8 +66,8 @@ def play():
 
 
 def train():
-    num_plays_train = 1000000
-    num_explores = 500000
+    num_plays_train = 10000
+    num_explores = num_plays_train / 2
     num_plays_test = 1000
     agent = Agent()
 
