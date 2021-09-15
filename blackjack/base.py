@@ -231,8 +231,10 @@ class Table:
         """
         envs = random.sample(list(self._table), k)
         values = [self._table[env] for env in envs]
-        for env, value in zip(envs, values):
+        counts = [self._count[env] for env in envs]
+        for env, value, count in zip(envs, values, counts):
             print(env)
+            print(count)
             print(value)
             print("-" * 100)
 
